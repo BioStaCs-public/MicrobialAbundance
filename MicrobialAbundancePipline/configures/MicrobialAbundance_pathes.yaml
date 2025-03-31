@@ -1,0 +1,24 @@
+# Resource Path Configuration
+path:
+  # Host reference genomes
+  host_fa_hg38: '/path/to/refs/GRCh38/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa'
+  host_img_hg38: '/path/to/refs/GRCh38/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa.img'
+  host_kmer_hg38: '/path/to/refs/GRCh38/GCA_000001405.15_GRCh38_no_alt_analysis_set.hss'
+
+  host_fa_t2t: '/path/to/refs/t2t/chm13v2.0.fa'
+  host_img_t2t: '/path/to/refs/t2t/chm13v2.0.fa.img'
+  host_kmer_t2t: '/path/to/refs/t2t/chm13v2.0.hss'
+  
+  # Microbial database
+  microbe_dict: '/path/to/refs/microbiome/BioStaCs_microbes.dict'
+  microbe_img: '/path/to/refs/microbiome/BioStaCs_microbes.fa.img'
+  taxonomy_file: '/path/to/refs/microbiome/BioStaCs_microbes.db'
+  ncid2microbeNames_file: '/path/to/refs/microbiome/BioStaCs_microbeNames_sep=tab.csv'
+  microbial_genome_length: '/path/to/refs/microbiome/BioStaCs_GenomeLength.csv'
+  tax_id_hierarchy: '/path/to/refs/microbiome/BioStaCs_taxid_hierarchy.txt'
+  catalog_genome: '/path/to/refs/microbiome/BioStaCs_catalog_genome.txt'
+  
+  # Tool paths
+  java17: '/opt/conda/envs/java17/bin/java'
+  gatk_4.6_jar: '/opt/biotools/gatk-4.6.0.0/gatk-package-4.6.0.0-local.jar'
+  fastp: '/opt/conda/envs/MicrobialAbundance/bin/fastp'
