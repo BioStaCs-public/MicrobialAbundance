@@ -2,13 +2,19 @@
 
 ## install 
 
-### **1. Download release**, pkgs and refs
+### **1. Download release**, pkgs , refs and test data
 
-#### (1) release: MicrobialAbundance
+#### (1) release:
 
+####  [MicrobialAbundance.zip](https://github.com/BioStaCs-public/MicrobialAbundance/archive/refs/heads/main.zip)
 
+```shell
+git clone https://github.com/BioStaCs-public/MicrobialAbundance.git
+```
 
-#### (2) pkgs:  [gatk-4.6.0.0.zip](https://github.com/broadinstitute/gatk/releases/download/4.6.0.0/gatk-4.6.0.0.zip)
+#### (2) pkgs:
+
+####   [gatk-4.6.0.0.zip](https://github.com/broadinstitute/gatk/releases/download/4.6.0.0/gatk-4.6.0.0.zip)
 
 ```shell
 #download pkgs
@@ -19,9 +25,9 @@ wget https://github.com/broadinstitute/gatk/releases/download/4.6.0.0/gatk-4.6.0
 unzip gatk-4.6.0.0.zip
 ```
 
-#### (3) refs: 
+#### (3) refs and test data: 
 
-
+https://pan.quark.cn/s/79002f0756ab?entry=webother#/list/share   password: 8T9J
 
 ### 2. create conda env
 
@@ -65,13 +71,12 @@ The `*` symbol in the list marks the currently activated environment, and the pa
 
 #### (2) **Configure in the following files**
 
-**MicrobialAbundance/MicrobialAbundancePipline/configures/MicrobialAbundance_pathes.yaml**
+**Configure1：MicrobialAbundance/MicrobialAbundancePipline/configures/MicrobialAbundance_pathes.yaml**
 
-**(Use absolute paths if you're not sure how Python handles relative paths.)**
+(Use absolute paths if you're not sure how Python handles relative paths.)
 
 ```yaml
 # MicrobialAbundance_pathes.yaml
-
 # Resource Path Configuration
 path:
   # Host reference genomes
@@ -98,11 +103,12 @@ path:
   fastp: '~/.conda/envs/MicrobialAbundance/bin/fastp'
 ```
 
-**MicrobialAbundance/MicrobialAbundancePipline/configures/MicrobialAbundance_configure.yaml**
+**Configure2：MicrobialAbundance/MicrobialAbundancePipline/configures/MicrobialAbundance_configure.yaml**
+
+(Single-end data must meet the following requirements: the folder should be named after the sample (sample), and it should contain `sample.fq.gz`, with the suffix required to be `.fq.gz`. The file format should be `sample/sample.fq.gz`. For paired-end data, the file formats should be `sample/sample.R1.fq.gz` and `sample/sample.R2.fq.gz`, with the suffixes required to be `.R1.fq.gz` and `.R2.fq.gz`, respectively.)
 
 ```yaml
 # MicrobialAbundance_configure.yaml
-
 # Configuration Paths
 path:
  tmp_dir : "<project_root>/tmp/"  # Temporary directory for processing files
