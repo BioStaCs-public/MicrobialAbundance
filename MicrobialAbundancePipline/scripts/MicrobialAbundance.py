@@ -163,7 +163,10 @@ def get_microbe_abundance(muilt_match_df_merge, tax_id_hierarchy_df, total_libra
                     'family_scientific_name','order_scientific_name','class_scientific_name','phylum_scientific_name','superkingdom_scientific_name',
                     'Genome Length','Total Library Size','Reads','Unique Match Reads','Best Match Reads','Score','eRPKM']
     micro_abundance = micro_abundance.loc[:,final_header]
-    micro_abundance['eRPKM Normalized'] = micro_abundance['eRPKM'] / micro_abundance['eRPKM'].sum() * 100
+    micro_abundance['eRPKM Normalized'] = (
+        micro_abundance.groupby("superkingdom_scientific_name", group_keys=False)["eRPKM"]
+        .transform(lambda x: x / x.sum() * 100)
+    )
     return micro_abundance
 
 def get_microbe_rank_abundance(muilt_match_df_merge, microbe_abundance_df, rank_name):
@@ -198,6 +201,10 @@ def get_microbe_rank_abundance(muilt_match_df_merge, microbe_abundance_df, rank_
     microbe_abundance_df_rank = pd.merge(microbe_abundance_df_rank,reads_df,how='left')
     
     microbe_abundance_df_rank['eRPKM Normalized'] = microbe_abundance_df_rank['eRPKM'] / microbe_abundance_df_rank['eRPKM'].sum() * 100
+    microbe_abundance_df_rank['eRPKM Normalized'] = (
+        microbe_abundance_df_rank.groupby("superkingdom_scientific_name", group_keys=False)["eRPKM"]
+        .transform(lambda x: x / x.sum() * 100)
+    )
     microbe_abundance_df_rank[rank_name] = microbe_abundance_df_rank[rank_name].astype(int)
 
     final_header = [f"{rank_name}",f"{rank_name}_scientific_name","superkingdom_scientific_name","Total Library Size","Reads","Unique Match Reads",
