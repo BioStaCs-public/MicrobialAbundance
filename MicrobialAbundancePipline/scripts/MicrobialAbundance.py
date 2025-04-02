@@ -200,7 +200,6 @@ def get_microbe_rank_abundance(muilt_match_df_merge, microbe_abundance_df, rank_
     reads_df = pd.DataFrame(reads_list,columns=[f'{rank_name}','Reads','Unique Match Reads'])
     microbe_abundance_df_rank = pd.merge(microbe_abundance_df_rank,reads_df,how='left')
     
-    microbe_abundance_df_rank['eRPKM Normalized'] = microbe_abundance_df_rank['eRPKM'] / microbe_abundance_df_rank['eRPKM'].sum() * 100
     microbe_abundance_df_rank['eRPKM Normalized'] = (
         microbe_abundance_df_rank.groupby("superkingdom_scientific_name", group_keys=False)["eRPKM"]
         .transform(lambda x: x / x.sum() * 100)
