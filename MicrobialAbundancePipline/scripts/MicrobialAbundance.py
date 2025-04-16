@@ -82,8 +82,8 @@ def exploded_other_references(df, best_match_length, match_length_threshold, pai
     matched_df['bestMatch'] = False
     
     df_combined = pd.concat([df, matched_df], ignore_index=True)
-    df_unique = df_combined.drop_duplicates(subset=['readsId','reads', 'nucleotideId'], keep='first')
-    return df_unique
+    
+    return df_combined
 
 def get_match_df(sample, output_nucleic, match_length_threshold, pair):
     """Process alignment file and extract match information
@@ -270,14 +270,19 @@ def microbe_abundancing(sample, match_df, output_nucleic, best_match_length, mat
         microbial_genome_length_with_taxid_sum_df (pd.DataFrame): Genome length data
         total_library_size (int): Total sequencing depth (host + non-host reads).
         pair (bool): Paired-end data indicator"""
+    
     muilt_match_df = exploded_other_references(match_df,best_match_length,match_length_threshold,pair)
     muilt_match_df_filtered = muilt_match_df[muilt_match_df.apply(filter_row, axis=1, args=(score_threshold,))]
+    
+    muilt_match_df_filtered = muilt_match_df_filtered.drop_duplicates(subset=['readsId','reads', 'nucleotideId'], keep='first')
     match_times = muilt_match_df_filtered.groupby(['readsId','reads']).size().reset_index(name='matchTimes')
     muilt_match_df_filtered = muilt_match_df_filtered.merge(match_times, on=['readsId','reads'])
+    
     muilt_match_df_merge = pd.merge(muilt_match_df_filtered,catalog_genome_rank_df,left_on='nucleotideId',right_on='genome_accession',how='left')
     muilt_match_df_merge.pop('genome_accession')
     muilt_match_df_merge = pd.merge(muilt_match_df_merge,microbial_genome_length_with_taxid_sum_df,how='left')
     muilt_match_df_merge = pd.merge(muilt_match_df_merge,tax_id_hierarchy_df,left_on='tax_id',right_on='tax_id',how='left')
+    
     microbe_abundance_df = get_microbe_abundance(muilt_match_df_merge,tax_id_hierarchy_df,total_library_size)
     microbe_abundance_df_species = get_microbe_rank_abundance(muilt_match_df_merge,microbe_abundance_df,'species')
     microbe_abundance_df_genus = get_microbe_rank_abundance(muilt_match_df_merge,microbe_abundance_df,'genus')
