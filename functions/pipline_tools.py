@@ -53,7 +53,7 @@ class tools:
         self.logger.addHandler(console_handler)
         self.logger.addHandler(file_handler)
     
-    def exec_cmd(self, cmd, sample):
+    def exec_cmd(self, cmd, sample, flag = None):
         """
         Execute a system command and track its execution status
         
@@ -66,6 +66,9 @@ class tools:
             cmd_name = ''.join(cmd.split(" ")[0].split("/")[-1])
         else:
             cmd_name = ' '.join(cmd.split(" ")[0:1])
+
+        if flag != None:
+            cmd_name = cmd_name + '_' + str(flag)
             
         # Configure log file path
         current_date = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
@@ -92,7 +95,7 @@ class tools:
         else:
             self.status(self.done_cmds_allSamples, sample, f"{cmd_name}", 'done', run_time, cmd)
 
-    def judge_then_exec(self, sample, cmd, file):
+    def judge_then_exec(self, sample, cmd, file, flag = None):
         """
         Conditionally execute command based on file existence and content
         
@@ -102,9 +105,9 @@ class tools:
             file (str): File path to check for existence/content
         """
         if not os.path.exists(file):
-            self.exec_cmd(cmd, sample)
+            self.exec_cmd(cmd, sample, flag)
         elif os.path.isfile(file) and os.path.getsize(file) == 0:
-            self.exec_cmd(cmd, sample)
+            self.exec_cmd(cmd, sample, flag)
         else:
             self.logger.warn(file+' already exists!')
 
@@ -148,6 +151,21 @@ class tools:
             self.logger.error(f"Command for sample {sample} exceeded timeout of {timeout} seconds.")
             
         self.run_cmds_allSamples[sample].remove(f"{cmd_name} timeout={timeout}")
+
+    def judge_then_exec_with_time(self, sample, cmd, file, timeout=3600):
+        """
+        Conditionally execute command based on file existence and content with timeout protection
+        Args:
+            sample (str): Sample identifier for logging
+            cmd (str): Command to execute if conditions met
+            file (str): File path to check for existence/content
+            timeout (int, optional): Maximum execution time in seconds
+        """
+        if not os.path.exists(file) or (os.path.isfile(file) and os.path.getsize(file) == 0):
+            self.exec_cmd_with_time(cmd, sample, timeout)
+        else:
+            self.logger.warn(file + ' already exists!')
+    
 
     def sharing_variable(self, manager, samples):
         """
@@ -274,17 +292,25 @@ class tools:
 
     def print_time(self, time):
         """
-        Format time duration for logging
+        Format time duration for logging (supports >24h)
         
         Args:
             time (datetime.timedelta): Time duration to format
         Returns:
-            str: Formatted time string (XhYmZs)
+            str: Formatted time string (XdXhXmXs)
         """
-        hour = int(time.seconds/3600)
-        minutes = int(time.seconds%3600/60)
-        seconds = int(time.seconds%60)
-        return f"{hour}h{minutes}m{seconds}s"
+        total_seconds = int(time.total_seconds())  # 关键：获取总秒数（包含天数）
+        days = total_seconds // 86400
+        remaining_seconds = total_seconds % 86400
+        hour = remaining_seconds // 3600
+        minutes = (remaining_seconds % 3600) // 60
+        seconds = remaining_seconds % 60
+        
+        # 按需拼接天数（如果 days > 0）
+        if days > 0:
+            return f"{days}d{hour}h{minutes}m{seconds}s"
+        else:
+            return f"{hour}h{minutes}m{seconds}s"
 
     def get_configure(self, args_configure):
         """
@@ -304,6 +330,23 @@ class tools:
                 configure = yaml.safe_load(file)
                 self.cp_configure(configure)
         return configure
+
+    def get_pathes(self, args_pathes):
+        """
+        Load pathes from YAML file
+        
+        Args:
+            args_pathes (str): Path to pathes file
+        Returns:
+            dict: Loaded configuration
+        """
+        if args_pathes is None or len(args_pathes) == 0:
+            with open(f"{self.sys_path}/configures/{self.log_type}_pathes.yaml","r") as file:
+                pathes = yaml.safe_load(file)
+        else:
+            with open(f"{args_pathes}","r") as file:
+                pathes = yaml.safe_load(file)
+        return pathes
 
     def write2shell(self, cmd, fileName):
         """
